@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Whackerlink CPS - Console</title>
+  <style>
+
+    :root {
+      --bg-color: #121212;
+      --surface-color: #1f1f1f;
+      --panel-color: #2a2a2a;
+      --border-color: #3a3a3a;
+      --text-color: #e0e0e0;
+      --muted-text: #a0a0a0;
+      --accent-color: #ffffff;       
+      --accent-hover: #ffffff;
+      --error-color: #cf6679;       
+      --button-bg: #ffffff;
+      --button-hover: #ffffff;
+      --remove-btn-bg: #cf6679;
+      --remove-btn-hover: #a23b4b;
+      --input-bg: #2a2a2a;
+      --input-border: #444;
+      --textarea-bg: #1f1f1f;
+      --textarea-border: #444;
+    }
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.5;
+    }
+    body {
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--accent-color);
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.25rem;
+      color: var(--text-color);
+    }
+
+  
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted-text);
+      margin-bottom: 0.25rem;
+    }
+    input[type="text"],
+    input[type="number"] {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--text-color);
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: var(--muted-text);
+    }
+    input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+    input[readonly] {
+      background-color: var(--surface-color);
+      cursor: not-allowed;
+      color: var(--muted-text);
+    }
+
+   
+    fieldset {
+      background-color: var(--panel-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem 1.2rem 1.2rem;  
+      margin-bottom: 1rem;
+      position: relative;           
+    }
+    fieldset legend {
+      position: absolute;
+      top: -0.6rem;                 
+      left: 1rem;                   
+      background-color: var(--panel-color);
+      padding: 0 0.5rem;           
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+
+    .btn {
+      display: inline-block;
+      background-color: var(--button-bg);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 0.75rem;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background-color: var(--button-hover);
+    }
+    .btn-remove {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--remove-btn-bg);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 50%;
+      width: 1.6rem;
+      height: 1.6rem;
+      font-size: 0.9rem;
+      line-height: 1.6rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .btn-remove:hover {
+      background-color: var(--remove-btn-hover);
+    }
+
+    
+    .horizontal-group {
+      display: flex;
+      gap: 2%;
+      margin-bottom: 0.75rem;
+    }
+    .small-inline {
+      width: 49%;
+    }
+    .indent {
+      margin-left: 1rem;
+      border-left: 2px solid var(--border-color);
+      padding-left: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    
+    textarea {
+      background-color: var(--textarea-bg);
+      border: 1px solid var(--textarea-border);
+      border-radius: 6px;
+      color: var(--text-color);
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      width: 100%;
+      height: 250px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+    textarea::placeholder {
+      color: var(--muted-text);
+    }
+
+   
+    .download-row {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .download-row input[type="text"] {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--text-color);
+      padding: 0.45rem 0.6rem;
+      width: auto;
+      font-size: 0.9rem;
+    }
+    .download-row label {
+      font-size: 0.9rem;
+      color: var(--muted-text);
+    }
+  </style>
+</head>
+<body>
+  <h1>Whackerlink Console CPS</h1>
+
+
+  <h2>radioWide</h2>
+  <fieldset id="radioWide-section">
+    <legend>General Radio Info</legend>
+
+    <label for="rw-hostVersion">hostVersion</label>
+    <input type="text" id="rw-hostVersion" value="R01.00.00" readonly />
+
+    <label for="rw-codeplugVersion">codeplugVersion</label>
+    <input type="text" id="rw-codeplugVersion" value="R01.00.00" readonly />
+
+    <label for="rw-radioAlias">radioAlias</label>
+    <input type="text" id="rw-radioAlias" placeholder="e.g. MyRadio" value="" />
+
+    <label for="rw-serialNumber">serialNumber</label>
+    <input type="text" id="rw-serialNumber" value="123ABC1234" />
+
+    <label for="rw-model">model</label>
+ 
+    <input type="text" id="rw-model" value="CONSOLE" readonly />
+
+    <label for="rw-inCarMode">inCarMode</label>
+  
+    <input type="text" id="rw-inCarMode" value="N/A" readonly />
+  </fieldset>
+
+
+  <h2>systems</h2>
+  <div id="systems-container"></div>
+  <button type="button" class="btn" onclick="addSystem()">+ Add System</button>
+
+  <h2>zones</h2>
+  <div id="zones-container"></div>
+  <button type="button" class="btn" onclick="addZone()">+ Add Zone</button>
+
+ 
+  <button type="button" class="btn" style="background-color: var(--accent-color); margin-top: 1.5rem;" onclick="generateYAML()">
+    Generate YML
+  </button>
+
+
+  <h2>Generated YML</h2>
+  <textarea id="yaml-output" readonly placeholder="Your YAML will appear here…"></textarea>
+
+  <!-- FILENAME + DOWNLOAD -->
+  <div class="download-row">
+    <label for="yaml-filename">Filename</label>
+    <input type="text" id="yaml-filename" value="codeplug.yml" placeholder="myConfig.yml" />
+    <button type="button" class="btn" style="background-color: var(--accent-color);" onclick="downloadYAML()">
+      Download YML
+    </button>
+  </div>
+
+  <script>
+  
+    function removeSelf(el) {
+      el.parentNode.remove();
+    }
+
+  
+    let systemCount = 0;
+    function addSystem(existing = null) {
+      systemCount++;
+      const idx = systemCount;
+      const container = document.getElementById('systems-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `system-${idx}`;
+      fs.innerHTML = `
+        <legend>System ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+
+        <label for="system-name-${idx}">name</label>
+        <input type="text" name="system-name" id="system-name-${idx}" value="${existing?.name || ''}" placeholder="System Name" />
+
+        <label for="system-address-${idx}">address</label>
+        <input type="text" name="system-address" id="system-address-${idx}" value="${existing?.address || 'localhost'}" placeholder="e.g. localhost or 1.2.3.4" />
+
+        <label for="system-port-${idx}">port</label>
+        <input type="number" name="system-port" id="system-port-${idx}" value="${existing?.port || 3000}" placeholder="e.g. 3000" />
+
+        <label for="system-authKey-${idx}">authKey</label>
+        <input type="text" name="system-authKey" id="system-authKey-${idx}" value="${existing?.authKey || ''}" placeholder="Secret Key" />
+
+        <label for="system-rid-${idx}">rid</label>
+        <input type="text" name="system-rid" id="system-rid-${idx}" value="${existing?.rid || ''}" placeholder="rid" />
+
+        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+          <label for="system-peerId-${idx}">peerId</label>
+          <input type="number" name="system-peerId" id="system-peerId-${idx}" value="${existing?.peerId || ''}" placeholder="(optional) peerId" style="width: 100%;" />
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+          <input type="checkbox" id="system-isDvm-${idx}" name="system-isDvm" ${existing?.isDvm ? 'checked' : ''} />
+          <label for="system-isDvm-${idx}" style="display: inline; margin:0; font-size:0.9rem; color:var(--muted-text);">
+            isDvm
+          </label>
+        </div>
+
+        <!-- Nested Site Block -->
+        <fieldset style="margin-top: 1rem;">
+          <legend>Site</legend>
+
+          <label for="site-name-${idx}">site.name</label>
+          <input type="text" name="site-name" id="site-name-${idx}" value="${existing?.site?.name || ''}" placeholder="Central Site" />
+
+          <label for="site-controlChannel-${idx}">site.controlChannel</label>
+          <input type="text" name="site-controlChannel" id="site-controlChannel-${idx}" value="${existing?.site?.controlChannel || ''}" placeholder="e.g. 772.74375" />
+
+          <!-- voiceChannels array -->
+          <div id="system-${idx}-voiceChannels-container" style="margin-top:0.5rem;"></div>
+          <button type="button" class="btn" style="font-size:0.8rem; margin-top:0.5rem;"
+                  onclick="addVoiceChannel(${idx})">
+            + Add Voice Channel
+          </button>
+
+          <!-- Location Sub-block -->
+          <fieldset style="margin-top: 1rem; background-color: var(--surface-color);">
+            <legend>location</legend>
+            <label for="site-loc-x-${idx}">x</label>
+            <input type="number" step="any" name="site-loc-x" id="site-loc-x-${idx}"
+                   value="${existing?.site?.location?.x || ''}" placeholder="e.g. 757.89" />
+
+            <label for="site-loc-y-${idx}">y</label>
+            <input type="number" step="any" name="site-loc-y" id="site-loc-y-${idx}"
+                   value="${existing?.site?.location?.y || ''}" placeholder="e.g. 1274.17" />
+
+            <label for="site-loc-z-${idx}">z</label>
+            <input type="number" step="any" name="site-loc-z" id="site-loc-z-${idx}"
+                   value="${existing?.site?.location?.z || ''}" placeholder="e.g. 360.3" />
+          </fieldset>
+
+          <label for="site-systemID-${idx}" style="margin-top:1rem;">site.systemID</label>
+          <input type="number" name="site-systemID" id="site-systemID-${idx}"
+                 value="${existing?.site?.systemID || ''}" placeholder="e.g. 1" />
+
+          <label for="site-siteID-${idx}">site.siteID</label>
+          <input type="number" name="site-siteID" id="site-siteID-${idx}"
+                 value="${existing?.site?.siteID || ''}" placeholder="e.g. 1" />
+
+          <label for="site-range-${idx}">site.range</label>
+          <input type="number" step="any" name="site-range" id="site-range-${idx}"
+                 value="${existing?.site?.range || ''}" placeholder="e.g. 1.5" />
+        </fieldset>
+      `;
+      container.appendChild(fs);
+
+      
+      if (existing?.site?.voiceChannels && Array.isArray(existing.site.voiceChannels)) {
+        existing.site.voiceChannels.forEach(vc => addVoiceChannel(idx, vc));
+      }
+    }
+
+   
+    const voiceChannelCounters = {};
+    function addVoiceChannel(systemIdx, existingValue = '') {
+      if (!voiceChannelCounters[systemIdx]) voiceChannelCounters[systemIdx] = 0;
+      voiceChannelCounters[systemIdx]++;
+      const vcIdx = voiceChannelCounters[systemIdx];
+      const vcContainer = document.getElementById(`system-${systemIdx}-voiceChannels-container`);
+      const div = document.createElement('div');
+      div.style.position = 'relative';
+      div.style.marginBottom = '0.75rem';
+      div.id = `system-${systemIdx}-voice-${vcIdx}`;
+      div.innerHTML = `
+        <label for="system-${systemIdx}-voiceChannel-${vcIdx}">voiceChannels[${vcIdx}]</label>
+        <input type="text" name="voiceChannel" id="system-${systemIdx}-voiceChannel-${vcIdx}"
+               value="${existingValue || ''}" placeholder="e.g. 772.74375" />
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+      `;
+      vcContainer.appendChild(div);
+    }
+
+  
+    let zoneCount = 0;
+    function addZone(existing = null) {
+      zoneCount++;
+      const idx = zoneCount;
+      const container = document.getElementById('zones-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `zone-${idx}`;
+      fs.innerHTML = `
+        <legend>Zone ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+
+        <label for="zone-name-${idx}">name</label>
+        <input type="text" name="zone-name" id="zone-name-${idx}" value="${existing?.name || ''}" placeholder="Zone Name" />
+
+        <div class="indent" id="zone-${idx}-channels"></div>
+        <button type="button" class="btn" onclick="addZoneChannel(${idx})">+ Add Channel</button>
+      `;
+      container.appendChild(fs);
+
+  
+      if (existing?.channels && Array.isArray(existing.channels)) {
+        existing.channels.forEach(ch => addZoneChannel(idx, ch));
+      }
+    }
+
+  
+    const zoneChannelCounters = {};
+    function addZoneChannel(zoneIdx, existing = null) {
+      if (!zoneChannelCounters[zoneIdx]) zoneChannelCounters[zoneIdx] = 0;
+      zoneChannelCounters[zoneIdx]++;
+      const chIdx = zoneChannelCounters[zoneIdx];
+      const zoneDiv = document.getElementById(`zone-${zoneIdx}-channels`);
+      const fs = document.createElement('fieldset');
+      fs.style.backgroundColor = 'var(--surface-color)';
+      fs.style.border = '1px solid var(--border-color)';
+      fs.style.borderRadius = '6px';
+      fs.style.padding = '0.75rem 1rem';
+      fs.style.marginTop = '0.5rem';
+      fs.style.position = 'relative';
+      fs.id = `zone-${zoneIdx}-channel-${chIdx}`;
+      fs.innerHTML = `
+        <legend>Channel ${chIdx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+
+        <label for="zone-${zoneIdx}-channel-name-${chIdx}">name</label>
+        <input type="text" name="channel-name" id="zone-${zoneIdx}-channel-name-${chIdx}" value="${existing?.name || ''}" placeholder="Channel Name" />
+
+        <label for="zone-${zoneIdx}-channel-system-${chIdx}">system</label>
+        <input type="text" name="channel-system" id="zone-${zoneIdx}-channel-system-${chIdx}" value="${existing?.system || ''}" placeholder="System Name" />
+
+        <label for="zone-${zoneIdx}-channel-tgid-${chIdx}">tgid</label>
+        <input type="text" name="channel-tgid" id="zone-${zoneIdx}-channel-tgid-${chIdx}" value="${existing?.tgid || ''}" placeholder="e.g. 2001" />
+
+        <label for="zone-${zoneIdx}-channel-keyId-${chIdx}">keyId</label>
+        <input type="text" name="channel-keyId" id="zone-${zoneIdx}-channel-keyId-${chIdx}" value="${existing?.keyId || ''}" placeholder="e.g. 0x50" />
+
+        <label for="zone-${zoneIdx}-channel-algoId-${chIdx}">algoId</label>
+        <input type="text" name="channel-algoId" id="zone-${zoneIdx}-channel-algoId-${chIdx}" value="${existing?.algoId || ''}" placeholder="e.g. 0xaa" />
+
+        <label for="zone-${zoneIdx}-channel-encryptionKey-${chIdx}">encryptionKey</label>
+        <input type="text" name="channel-encryptionKey" id="zone-${zoneIdx}-channel-encryptionKey-${chIdx}" value="${existing?.encryptionKey || ''}" placeholder="(optional) encryption key"/>
+      `;
+      zoneDiv.appendChild(fs);
+    }
+
+   
+    function generateYAML() {
+      try {
+    
+        function esc(str) {
+          return String(str).replace(/"/g, '\\"');
+        }
+
+    
+        const rwAliasElem  = document.getElementById('rw-radioAlias');
+        const rwAlias      = rwAliasElem ? rwAliasElem.value.trim() : '';
+        const rwSerialElem = document.getElementById('rw-serialNumber');
+        const rwSerial     = rwSerialElem ? rwSerialElem.value.trim() : '';
+        const rwModelElem  = document.getElementById('rw-model');
+        const rwModel      = rwModelElem ? rwModelElem.value.trim() : '';
+        const rwInCarElem  = document.getElementById('rw-inCarMode');
+        const rwInCar      = rwInCarElem ? rwInCarElem.value.trim() : '';
+
+        let yaml = '';
+        yaml += 'radioWide:\n';
+        yaml += '  hostVersion: "R01.00.00"\n';
+        yaml += '  codeplugVersion: "R01.00.00"\n';
+        yaml += `  radioAlias: "${esc(rwAlias)}"\n`;
+        yaml += `  serialNumber: "${esc(rwSerial)}"\n`;
+        yaml += `  model: "${esc(rwModel)}"\n`;
+        yaml += `  inCarMode: "${esc(rwInCar)}"\n\n`;
+
+    
+        yaml += 'systems:\n';
+        const systemFieldsets = document.querySelectorAll('#systems-container fieldset[id^="system-"]');
+        if (systemFieldsets.length === 0) {
+          yaml += '  []\n';
+        } else {
+          systemFieldsets.forEach(fsSys => {
+            const parts = fsSys.id.split('-'); 
+            const sysIdx = parts[1];
+
+            const nameElem    = fsSys.querySelector('input[name="system-name"]');
+            const addrElem    = fsSys.querySelector('input[name="system-address"]');
+            const portElem    = fsSys.querySelector('input[name="system-port"]');
+            const keyElem     = fsSys.querySelector('input[name="system-authKey"]');
+            const ridElem     = fsSys.querySelector('input[name="system-rid"]');
+            const peerElem    = fsSys.querySelector('input[name="system-peerId"]');
+            const isDvmElem   = fsSys.querySelector('input[name="system-isDvm"]');
+
+            const name     = nameElem    ? nameElem.value.trim()    : '';
+            const address  = addrElem    ? addrElem.value.trim()    : '';
+            const portVal  = portElem    ? portElem.value.trim()    : '';
+            const authKey  = keyElem     ? keyElem.value.trim()     : '';
+            const rid      = ridElem     ? ridElem.value.trim()     : '';
+            const peerId   = peerElem    ? peerElem.value.trim()    : '';
+            const isDvm    = isDvmElem   ? isDvmElem.checked         : false;
+
+            
+            if (!name && !address && !portVal && !authKey && !rid && !peerId && !isDvm) return;
+
+            yaml += '  - name: "' + esc(name) + '"\n';
+            yaml += '    address: "' + esc(address) + '"\n';
+            yaml += '    port: ' + (portVal === '' ? 'null' : Number(portVal)) + '\n';
+            yaml += '    authKey: "' + esc(authKey) + '"\n';
+            yaml += '    rid: "' + esc(rid) + '"\n';
+            if (peerId) {
+              yaml += '    peerId: ' + Number(peerId) + '\n';
+            }
+            if (isDvm) {
+              yaml += '    isDvm: true\n';
+            }
+
+            
+            yaml += '    site:\n';
+            const sNameElem   = fsSys.querySelector('input[name="site-name"]');
+            const sCtrlElem   = fsSys.querySelector('input[name="site-controlChannel"]');
+            const sName       = sNameElem   ? sNameElem.value.trim()   : '';
+            const sControl    = sCtrlElem   ? sCtrlElem.value.trim()   : '';
+            yaml += '      name: "' + esc(sName) + '"\n';
+            yaml += '      controlChannel: "' + esc(sControl) + '"\n';
+
+            
+            const vcElems = fsSys.querySelectorAll('input[name="voiceChannel"]');
+            yaml += '      voiceChannels:\n';
+            if (vcElems.length === 0) {
+              yaml += '        []\n';
+            } else {
+              vcElems.forEach(inputVc => {
+                const vcVal = inputVc.value.trim();
+                if (vcVal) {
+                  yaml += '        - "' + esc(vcVal) + '"\n';
+                }
+              });
+            }
+
+          
+            yaml += '      location:\n';
+            const lxElem = fsSys.querySelector('input[name="site-loc-x"]');
+            const lyElem = fsSys.querySelector('input[name="site-loc-y"]');
+            const lzElem = fsSys.querySelector('input[name="site-loc-z"]');
+            const lx     = lxElem ? lxElem.value.trim() : '';
+            const ly     = lyElem ? lyElem.value.trim() : '';
+            const lz     = lzElem ? lzElem.value.trim() : '';
+            yaml += '        x: ' + (lx === '' ? 'null' : Number(lx)) + '\n';
+            yaml += '        y: ' + (ly === '' ? 'null' : Number(ly)) + '\n';
+            yaml += '        z: ' + (lz === '' ? 'null' : Number(lz)) + '\n';
+
+            
+            const sSysIDElem = fsSys.querySelector('input[name="site-systemID"]');
+            const sSiteIDElem= fsSys.querySelector('input[name="site-siteID"]');
+            const sRangeElem = fsSys.querySelector('input[name="site-range"]');
+            const sSysID     = sSysIDElem  ? sSysIDElem.value.trim()  : '';
+            const sSiteID    = sSiteIDElem ? sSiteIDElem.value.trim() : '';
+            const sRange     = sRangeElem  ? sRangeElem.value.trim()  : '';
+            yaml += '      systemID: ' + (sSysID === '' ? 'null' : Number(sSysID)) + '\n';
+            yaml += '      siteID: '   + (sSiteID === '' ? 'null' : Number(sSiteID)) + '\n';
+            yaml += '      range: '    + (sRange === '' ? 'null' : Number(sRange)) + '\n';
+          });
+        }
+        yaml += '\n';
+
+        
+        yaml += 'zones:\n';
+        const zoneFieldsets = document.querySelectorAll('#zones-container fieldset[id^="zone-"]');
+        if (zoneFieldsets.length === 0) {
+          yaml += '  []\n';
+        } else {
+          zoneFieldsets.forEach(fsZone => {
+            const zParts   = fsZone.id.split('-'); 
+            const zIdx     = zParts[1];
+            const zNameElem= fsZone.querySelector('input[name="zone-name"]');
+            const zName    = zNameElem ? zNameElem.value.trim() : '';
+            if (!zName) return;
+            yaml += '  - name: "' + esc(zName) + '"\n';
+            yaml += '    channels:\n';
+
+            const channelFSs = document.querySelectorAll(`#zone-${zIdx}-channels fieldset`);
+            if (channelFSs.length === 0) {
+              yaml += '      []\n';
+            } else {
+              channelFSs.forEach(chFS => {
+                const cNameElem = chFS.querySelector('input[name="channel-name"]');
+                const cSysElem  = chFS.querySelector('input[name="channel-system"]');
+                const cTgidElem = chFS.querySelector('input[name="channel-tgid"]');
+                const cKeyElem  = chFS.querySelector('input[name="channel-keyId"]');
+                const cAlgoElem = chFS.querySelector('input[name="channel-algoId"]');
+                const cEncElem  = chFS.querySelector('input[name="channel-encryptionKey"]');
+
+                const cName    = cNameElem ? cNameElem.value.trim()    : '';
+                const cSys     = cSysElem  ? cSysElem.value.trim()     : '';
+                const cTgid    = cTgidElem ? cTgidElem.value.trim()    : '';
+                const cKey     = cKeyElem  ? cKeyElem.value.trim()     : '';
+                const cAlgo    = cAlgoElem ? cAlgoElem.value.trim()    : '';
+                const cEnc     = cEncElem  ? cEncElem.value.trim()     : '';
+
+                if (!cName && !cSys && !cTgid && !cKey && !cAlgo && !cEnc) return;
+                yaml += '      - name: "' + esc(cName) + '"\n';
+                yaml += '        system: "' + esc(cSys) + '"\n';
+                yaml += '        tgid: "' + esc(cTgid) + '"\n';
+                if (cKey) {
+                  yaml += '        keyId: ' + esc(cKey) + '\n';
+                }
+                if (cAlgo) {
+                  yaml += '        algoId: ' + esc(cAlgo) + '\n';
+                }
+                if (cEnc) {
+                  yaml += '        encryptionKey: ' + (cEnc.toLowerCase() === 'null' ? 'null' : `"${esc(cEnc)}"`) + '\n';
+                }
+              });
+            }
+          });
+        }
+
+        
+        if (!yaml.trim()) {
+          alert('No YAML content was generated. Make sure you filled out at least one section.');
+        }
+        document.getElementById('yaml-output').value = yaml;
+      }
+      catch (e) {
+        alert('Error generating YAML: ' + e.message);
+      }
+    }
+
+ 
+    function downloadYAML() {
+      const contentElem = document.getElementById('yaml-output');
+      const content     = contentElem ? contentElem.value : '';
+      if (!content) {
+        alert('Please click "Generate YML" first.');
+        return;
+      }
+      let filenameElem = document.getElementById('yaml-filename');
+      let filename     = filenameElem ? filenameElem.value.trim() : '';
+      if (!filename) {
+        alert('Please enter a filename (e.g. myConfig.yml).');
+        return;
+      }
+      if (!filename.toLowerCase().endsWith('.yml') && !filename.toLowerCase().endsWith('.yml')) {
+        filename += '.yml';
+      }
+
+      const blob = new Blob([content], { type: 'text/yaml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+   
+    window.addEventListener('DOMContentLoaded', () => {
+      addSystem();
+      addZone();
+      addZoneChannel(1);
+    });
+  </script>
+</body>
+</html>
