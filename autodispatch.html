@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Whackerlink CPS - Auto Dispatch</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --panel: #1f1f1f;
+      --card: #2a2a2a;
+      --border: #3a3a3a;
+      --fg: #e0e0e0;
+      --muted: #a0a0a0;
+      --accent: #fbffff;
+      --accent-hover: #ffffff;
+      --error: #cf6679;
+      --input-bg: #2a2a2a;
+      --input-border: #444;
+      --textarea-bg: #1f1f1f;
+      --textarea-border: #444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Segoe UI", Tahoma, Verdana, sans-serif;
+      line-height: 1.5;
+    }
+    body { padding: 20px; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; color: var(--accent); }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.25rem;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--fg);
+      padding: 0.4rem 0.6rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder { color: var(--muted); }
+    input[type="checkbox"] { margin-right: 0.5rem; }
+    input[readonly] {
+      background: var(--panel);
+      cursor: not-allowed;
+      color: var(--muted);
+    }
+    fieldset {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem 1.2rem;
+      margin-bottom: 1rem;
+      position: relative;
+
+    }
+    fieldset legend {
+      position: absolute;
+      top: -0.6rem;
+      left: 1rem;
+      padding: 0 0.5rem;
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-remove {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--error);
+      color: var(--bg);
+      border: none;
+      border-radius: 50%;
+      width: 1.6rem;
+      height: 1.6rem;
+      font-size: 0.9rem;
+      line-height: 1.6rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-remove:hover { background: #a23b4b; }
+    .horizontal { display: flex; gap: 2%; margin-bottom: 0.75rem; }
+    .half { width: 49%; }
+    .indent {
+      margin-left: 1rem;
+      border-left: 2px solid var(--border);
+      padding-left: 1rem;
+      margin-top: 0.75rem;
+    }
+    textarea {
+      width: 100%;
+      height: 250px;
+      background: var(--textarea-bg);
+      border: 1px solid var(--textarea-border);
+      border-radius: 6px;
+      color: var(--fg);
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      resize: vertical;
+    }
+    textarea::placeholder { color: var(--muted); }
+    .download-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .download-row input[type="text"] {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--fg);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      width: auto;
+    }
+    .download-row label { font-size: 0.9rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>Fire Dispatch YAML Builder</h1>
+
+
+  <h2>General</h2>
+  <fieldset>
+    <legend>General</legend>
+    <label for="tmpl-name">templateName</label>
+    <input type="text" id="tmpl-name" placeholder="Fire Dispatch" value="Fire Dispatch" />
+    <label for="murf-key">murfApiKey</label>
+    <input type="text" id="murf-key" placeholder="(optional)" value="" />
+    <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
+      <input type="checkbox" id="repeat-flag" checked />
+      <label for="repeat-flag" style="display:inline; color:var(--muted);">repeat</label>
+    </div>
+  </fieldset>
+
+
+  <h2>channels</h2>
+  <div id="channels-container"></div>
+  <button class="btn" onclick="addChannel()">+ Add Channel</button>
+
+
+  <h2>network</h2>
+  <fieldset id="network-section">
+    <legend>network</legend>
+    <label for="net-address">address</label>
+    <input type="text" id="net-address" value="127.0.0.1" placeholder="127.0.0.1" />
+    <label for="net-port">port</label>
+    <input type="number" id="net-port" value="3000" placeholder="3000" />
+    <label for="net-authKey">authKey</label>
+    <input type="text" id="net-authKey" value="UNATH" placeholder="UNATH" />
+    <label for="net-srcId">srcId</label>
+    <input type="number" id="net-srcId" value="192" placeholder="192" />
+
+
+    <fieldset style="margin-top:1rem;">
+      <legend>site</legend>
+      <label for="site-name">site.name</label>
+      <input type="text" id="site-name" value="Central Site" placeholder="Central Site" />
+      <label for="site-ctrl">site.controlChannel</label>
+      <input type="text" id="site-ctrl" value="772.74375" placeholder="772.74375" />
+      <label for="site-siteID">site.siteID</label>
+      <input type="text" id="site-siteID" value="1" placeholder="1" />
+      <label for="site-systemID">site.systemID</label>
+      <input type="text" id="site-systemID" value="1" placeholder="1" />
+    </fieldset>
+  </fieldset>
+
+
+  <h2>dvm</h2>
+  <fieldset id="dvm-section">
+    <legend>dvm</legend>
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <input type="checkbox" id="dvm-enabled" />
+      <label for="dvm-enabled" style="display:inline; color:var(--muted);">
+        enabled (disables comms if true)
+      </label>
+    </div>
+    <label for="dvm-address" style="margin-top:0.5rem;">address</label>
+    <input type="text" id="dvm-address" value="127.0.0.1" placeholder="127.0.0.1" />
+    <label for="dvm-port">port</label>
+    <input type="number" id="dvm-port" value="32001" placeholder="32001" />
+  </fieldset>
+
+
+  <h2>ttsConfig</h2>
+  <fieldset id="tts-section">
+    <legend>ttsConfig</legend>
+    <label for="tts-pitch">pitch</label>
+    <input type="number" id="tts-pitch" value="-8" placeholder="-8" />
+    <label for="tts-rate">rate</label>
+    <input type="number" id="tts-rate" value="10" placeholder="10" />
+  </fieldset>
+
+
+  <h2>imperial</h2>
+  <fieldset id="imp-section">
+    <legend>imperial</legend>
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <input type="checkbox" id="imp-enabled" />
+      <label for="imp-enabled" style="display:inline; color:var(--muted);">enabled</label>
+    </div>
+    <label for="imp-commId" style="margin-top:0.5rem;">commId</label>
+    <input type="text" id="imp-commId" placeholder="COMMUNITY_ID" value="COMMUNITY_ID" />
+    <label for="imp-apiKey">apiKey</label>
+    <input type="text" id="imp-apiKey" placeholder="API_KEY" value="API_KEY" />
+  </fieldset>
+
+
+  <h2>fields</h2>
+  <div id="fields-container"></div>
+  <button class="btn" onclick="addField()">+ Add Field</button>
+
+  
+  <button class="btn" style="background:var(--accent)" onclick="generateYAML()">
+    Generate YML
+  </button>
+  <h2>Generated YML</h2>
+  <textarea id="yaml-output" readonly placeholder="Your YAML will appear here…"></textarea>
+
+  
+  <div class="download-row">
+    <label for="filename">Filename</label>
+    <input type="text" id="filename" value="dispatch.yml" placeholder="myConfig.yml" />
+    <button class="btn" style="background:var(--accent)" onclick="downloadYAML()">
+      Download YML
+    </button>
+  </div>
+
+  <script>
+ 
+    function removeSelf(el) {
+      el.parentNode.remove();
+    }
+
+    
+    let channelCount = 0;
+    function addChannel(existing = null) {
+      channelCount++;
+      const idx = channelCount;
+      const container = document.getElementById('channels-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `chan-${idx}`;
+      fs.innerHTML = `
+        <legend>Channel ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <label for="chan-name-${idx}">name</label>
+        <input type="text" id="chan-name-${idx}" name="chan-name" value="${existing?.name || ''}" placeholder="Channel 1" />
+        <label for="chan-dst-${idx}">dstId</label>
+        <input type="text" id="chan-dst-${idx}" name="chan-dst" value="${existing?.dstId || ''}" placeholder="2001" />
+      `;
+      container.appendChild(fs);
+    }
+
+    
+    let fieldCount = 0;
+    function addField(existing = null) {
+      fieldCount++;
+      const idx = fieldCount;
+      const container = document.getElementById('fields-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `field-${idx}`;
+      fs.innerHTML = `
+        <legend>Field ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+
+        <label for="field-name-${idx}">name</label>
+        <input type="text" id="field-name-${idx}" name="field-name" value="${existing?.name || ''}" placeholder="Departments" />
+
+        <label for="field-type-${idx}">type</label>
+        <input type="text" id="field-type-${idx}" name="field-type" value="${existing?.type || ''}" placeholder="Dropdown" />
+
+        <div style="display:flex; gap:1rem; margin-top:0.5rem;">
+          <div style="flex:1;">
+            <input type="checkbox" id="field-multiple-${idx}" name="field-multiple" ${existing?.multiple ? 'checked' : ''} />
+            <label for="field-multiple-${idx}" style="display:inline; color:var(--muted);">multiple</label>
+          </div>
+          <div style="flex:1;">
+            <input type="checkbox" id="field-endOnly-${idx}" name="field-endOnly" ${existing?.endOnly ? 'checked' : ''} />
+            <label for="field-endOnly-${idx}" style="display:inline; color:var(--muted);">endOnly</label>
+          </div>
+        </div>
+
+        <label for="field-sep-${idx}" style="margin-top:0.5rem;">separator</label>
+        <input type="text" id="field-sep-${idx}" name="field-separator" value="${existing?.separator || ''}" placeholder="..."/>
+
+        <label for="field-ender-${idx}">ender</label>
+        <input type="text" id="field-ender-${idx}" name="field-ender" value="${existing?.ender || ''}" placeholder="... "/>
+
+        <label for="field-said-${idx}">saidName</label>
+        <input type="text" id="field-said-${idx}" name="field-saidName" value="${existing?.saidName || ''}" placeholder="Respond on"/>
+
+        <label style="margin-top:0.5rem;">
+          <input type="checkbox" id="field-includeName-${idx}" name="field-includeFieldName" ${existing?.includeFieldName ? 'checked' : ''} />
+          <span style="color:var(--muted);">includeFieldName</span>
+        </label>
+
+        <div id="field-${idx}-opts-container" style="margin-top:0.5rem;"></div>
+        <button type="button" class="btn" style="font-size:0.8rem; margin-top:0.5rem;" onclick="addOption(${idx})">
+          + Add Option
+        </button>
+      `;
+      container.appendChild(fs);
+
+    
+      if (existing?.options && Array.isArray(existing.options)) {
+        existing.options.forEach(opt => addOption(idx, opt));
+      }
+    }
+
+    const optionCounters = {};
+    function addOption(fieldIdx, existing = '') {
+      if (!optionCounters[fieldIdx]) optionCounters[fieldIdx] = 0;
+      optionCounters[fieldIdx]++;
+      const optIdx = optionCounters[fieldIdx];
+      const optContainer = document.getElementById(`field-${fieldIdx}-opts-container`);
+      const div = document.createElement('div');
+      div.style.position = 'relative';
+      div.style.marginBottom = '0.75rem';
+      div.id = `field-${fieldIdx}-opt-${optIdx}`;
+      div.innerHTML = `
+        <label for="field-${fieldIdx}-opt-input-${optIdx}">options[${optIdx - 1}]</label>
+        <input type="text" id="field-${fieldIdx}-opt-input-${optIdx}" name="field-option" value="${existing}" placeholder="Option value" />
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+      `;
+      optContainer.appendChild(div);
+    }
+
+  
+    window.addEventListener('DOMContentLoaded', () => {
+      addChannel({ name:"Channel 1", dstId:"2001" });
+      addChannel({ name:"Channel 2", dstId:"2002" });
+      addField({
+        name: "Departments",
+        type: "Dropdown",
+        multiple: true,
+        separator: "...",
+        ender: "... ",
+        options: ["Squad 21","Engine 21","Station 22","Escambia Engine 4","Tanker 11","Ladder 21","Chiefs"]
+      });
+      addField({
+        name:"Call Type",
+        type:"Dropdown",
+        ender:".... ",
+        options:["Residential structure fire","Confirmed residential structure fire","Activated automatic fire alarm","Medical"]
+      });
+      addField({
+        name:"Address",
+        type:"TextBox",
+        includeFieldName:false,
+        ender:".... "
+      });
+      addField({
+        name:"Channel",
+        saidName:"Respond on",
+        type:"Dropdown",
+        ender:".... ",
+        includeFieldName:true,
+        endOnly:true,
+        options:["TAC 1","TAC 2"]
+      });
+    });
+
+    
+    function generateYAML() {
+      try {
+        function esc(s){ return String(s).replace(/"/g,'\\"'); }
+
+        
+        const tmplName = document.getElementById('tmpl-name').value.trim();
+        const murfKey = document.getElementById('murf-key').value.trim();
+        const repeat = document.getElementById('repeat-flag').checked;
+
+        let yaml = '';
+        yaml += `templateName: "${esc(tmplName)}"\n\n`;
+        yaml += `murfApiKey: "${esc(murfKey)}"\n\n`;
+        yaml += `repeat: ${repeat}\n\n`;
+
+       
+        yaml += 'channels:\n';
+        const chFS = document.querySelectorAll('#channels-container fieldset[id^="chan-"]');
+        if (chFS.length === 0) {
+          yaml += '  []\n\n';
+        } else {
+          chFS.forEach(fs => {
+            const id = fs.id.split('-')[1];
+            const nm = fs.querySelector(`input[name="chan-name"]`).value.trim();
+            const dst= fs.querySelector(`input[name="chan-dst"]`).value.trim();
+            if (!nm && !dst) return;
+            yaml += '  - name: "' + esc(nm) + '"\n';
+            yaml += '    dstId: "' + esc(dst) + '"\n';
+          });
+          yaml += '\n';
+        }
+
+        
+        const netAddr = document.getElementById('net-address').value.trim();
+        const netPort = document.getElementById('net-port').value.trim();
+        const netKey  = document.getElementById('net-authKey').value.trim();
+        const netSrc  = document.getElementById('net-srcId').value.trim();
+        yaml += 'network:\n';
+        yaml += '  address: "' + esc(netAddr) + '"\n';
+        yaml += '  port: ' + (netPort|| 'null') + '\n';
+        yaml += '  authKey: "' + esc(netKey) + '"\n';
+        yaml += '  srcId: ' + (netSrc || 'null') + '\n';
+
+       
+        const sName = document.getElementById('site-name').value.trim();
+        const sCtrl = document.getElementById('site-ctrl').value.trim();
+        const sSite = document.getElementById('site-siteID').value.trim();
+        const sSys  = document.getElementById('site-systemID').value.trim();
+        yaml += '  site:\n';
+        yaml += '    name: "' + esc(sName) + '"\n';
+        yaml += '    controlChannel: "' + esc(sCtrl) + '"\n';
+        yaml += '    siteID: "' + esc(sSite) + '"\n';
+        yaml += '    systemID: "' + esc(sSys) + '"\n\n';
+
+        
+        const dvmEn = document.getElementById('dvm-enabled').checked;
+        const dvmAddr = document.getElementById('dvm-address').value.trim();
+        const dvmPort = document.getElementById('dvm-port').value.trim();
+        yaml += 'dvm:\n';
+        yaml += '  enabled: ' + dvmEn + '\n';
+        yaml += '  address: ' + (dvmAddr? `"${esc(dvmAddr)}"` : 'null') + '\n';
+        yaml += '  port: ' + (dvmPort || 'null') + '\n\n';
+
+        
+        const ttsPitch = document.getElementById('tts-pitch').value.trim();
+        const ttsRate  = document.getElementById('tts-rate').value.trim();
+        yaml += 'ttsConfig:\n';
+        yaml += '  pitch: ' + (ttsPitch || 'null') + '\n';
+        yaml += '  rate: ' + (ttsRate || 'null') + '\n\n';
+
+        
+        const impEn = document.getElementById('imp-enabled').checked;
+        const impComm= document.getElementById('imp-commId').value.trim();
+        const impKey = document.getElementById('imp-apiKey').value.trim();
+        yaml += 'imperial:\n';
+        yaml += '  enabled: ' + impEn + '\n';
+        yaml += '  commId: "' + esc(impComm) + '"\n';
+        yaml += '  apiKey: "' + esc(impKey) + '"\n\n';
+
+        
+        yaml += 'fields:\n';
+        const fieldFS = document.querySelectorAll('#fields-container fieldset[id^="field-"]');
+        if (fieldFS.length === 0) {
+          yaml += '  []\n';
+        } else {
+          fieldFS.forEach(fsF => {
+            const id = fsF.id.split('-')[1];
+            const nmElem = fsF.querySelector(`input[name="field-name"]`);
+            const tyElem = fsF.querySelector(`input[name="field-type"]`);
+            const mult   = fsF.querySelector(`input[name="field-multiple"]`).checked;
+            const endOnly= fsF.querySelector(`input[name="field-endOnly"]`).checked;
+            const sep    = fsF.querySelector(`#field-sep-${id}`).value.trim();
+            const ender  = fsF.querySelector(`#field-ender-${id}`).value.trim();
+            const said   = fsF.querySelector(`#field-said-${id}`).value.trim();
+            const includeName = fsF.querySelector(`#field-includeName-${id}`).checked;
+
+            const fn = nmElem ? nmElem.value.trim() : '';
+            const ft = tyElem ? tyElem.value.trim() : '';
+            if (!fn && !ft) return;
+            yaml += '  - name: "' + esc(fn) + '"\n';
+            yaml += '    type: "' + esc(ft) + '"\n';
+            if (mult) yaml += '    multiple: true\n';
+            if (sep) yaml += '    separator: "' + esc(sep) + '"\n';
+            if (ender) yaml += '    ender: "' + esc(ender) + '"\n';
+            if (said) yaml += '    saidName: "' + esc(said) + '"\n';
+            if (includeName) yaml += '    includeFieldName: true\n';
+            if (endOnly) yaml += '    endOnly: true\n';
+
+            
+            yaml += '    options:\n';
+            const opts = fsF.querySelectorAll(`input[name="field-option"]`);
+            if (opts.length === 0) {
+              yaml += '      []\n';
+            } else {
+              opts.forEach(optInput => {
+                const ov = optInput.value.trim();
+                if (ov) yaml += '      - "' + esc(ov) + '"\n';
+              });
+            }
+          });
+        }
+
+        document.getElementById('yaml-output').value = yaml;
+      } catch(e) {
+        alert('Error generating YML: ' + e.message);
+      }
+    }
+
+    
+    function downloadYAML() {
+      const content = document.getElementById('yaml-output').value;
+      if (!content) {
+        alert('Please click “Generate YML” first.');
+        return;
+      }
+      let fn = document.getElementById('filename').value.trim();
+      if (!fn) { alert('Enter a filename.'); return; }
+      if (!fn.toLowerCase().endsWith('.yml') && !fn.toLowerCase().endsWith('.yml')) {
+        fn += '.yml';
+      }
+      const blob = new Blob([content], { type: 'text/yml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fn;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
