@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Whackerlink CPS - Radio</title>
+  <style>
+ 
+    :root {
+      --bg-color: #121212;
+      --surface-color: #1f1f1f;
+      --panel-color: #2a2a2a;
+      --border-color: #3a3a3a;
+      --text-color: #e0e0e0;
+      --muted-text: #a0a0a0;
+      --accent-color: #ffffff;       
+      --accent-hover:  #ffffff;
+      --error-color: #cf6679;       
+      --button-bg:  #ffffff;
+      --button-hover:  #ffffff;
+      --remove-btn-bg: #cf6679;
+      --remove-btn-hover: #a23b4b;
+      --input-bg: #2a2a2a;
+      --input-border: #444;
+      --textarea-bg: #1f1f1f;
+      --textarea-border: #444;
+    }
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.5;
+    }
+    body {
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--accent-color);
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.25rem;
+      color: var(--text-color);
+    }
+
+  
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted-text);
+      margin-bottom: 0.25rem;
+    }
+    input[type="text"],
+    input[type="number"] {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--text-color);
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: var(--muted-text);
+    }
+    input[readonly] {
+      background-color: var(--surface-color);
+      cursor: not-allowed;
+      color: var(--muted-text);
+    }
+
+  
+    fieldset {
+      background-color: var(--panel-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    fieldset legend {
+      font-weight: bold;
+      color: var(--accent-color);
+      padding: 0 0.5rem;
+      margin-left: -0.5rem;
+      font-size: 1rem;
+    }
+
+  
+    .btn {
+      display: inline-block;
+      background-color: var(--button-bg);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 0.75rem;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background-color: var(--button-hover);
+    }
+    .btn-remove {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--remove-btn-bg);
+      color: var(--bg-color);
+      border: none;
+      border-radius: 50%;
+      width: 1.6rem;
+      height: 1.6rem;
+      font-size: 0.9rem;
+      line-height: 1.6rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .btn-remove:hover {
+      background-color: var(--remove-btn-hover);
+    }
+
+   
+    .horizontal-group {
+      display: flex;
+      gap: 2%;
+      margin-bottom: 0.75rem;
+    }
+    .small-inline {
+      width: 49%;
+    }
+    .indent {
+      margin-left: 1rem;
+      border-left: 2px solid var(--border-color);
+      padding-left: 1rem;
+      margin-top: 0.5rem;
+    }
+
+   
+    textarea {
+      background-color: var(--textarea-bg);
+      border: 1px solid var(--textarea-border);
+      border-radius: 6px;
+      color: var(--text-color);
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      width: 100%;
+      height: 250px;
+      resize: vertical;
+      margin-bottom: 1rem;
+    }
+    textarea::placeholder {
+      color: var(--muted-text);
+    }
+
+
+    .download-row {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .download-row input[type="text"] {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      color: var(--text-color);
+      padding: 0.45rem 0.6rem;
+      width: auto;
+      font-size: 0.9rem;
+    }
+    .download-row label {
+      font-size: 0.9rem;
+      color: var(--muted-text);
+    }
+  </style>
+</head>
+<body>
+  <h1>Whackerlink CPS</h1>
+
+ 
+  <h2>radioWide</h2>
+  <fieldset id="radioWide-section">
+    <legend>General Radio Info</legend>
+
+    <label for="rw-hostVersion">hostVersion</label>
+    <input type="text" id="rw-hostVersion" value="R01.00.00" readonly />
+
+    <label for="rw-codeplugVersion">codeplugVersion</label>
+    <input type="text" id="rw-codeplugVersion" value="R01.00.00" readonly />
+
+    <label for="rw-radioAlias">radioAlias</label>
+    <input type="text" id="rw-radioAlias" placeholder="e.g. MyRadio" value="" />
+
+    <label for="rw-serialNumber">serialNumber</label>
+    <input type="text" id="rw-serialNumber" value="123ABC1234" />
+
+    <label for="rw-model">model</label>
+    <input type="text" id="rw-model" value="APX6000" />
+
+    <label for="rw-inCarMode">inCarMode</label>
+    <input type="text" id="rw-inCarMode" value="APX4500" />
+  </fieldset>
+
+
+  <h2>systems</h2>
+  <div id="systems-container"></div>
+  <button type="button" class="btn" onclick="addSystem()">+ Add System</button>
+
+>
+  <h2>qcList</h2>
+  <div id="qcList-container"></div>
+  <button type="button" class="btn" onclick="addQcEntry()">+ Add QC Entry</button>
+
+
+  <h2>zones</h2>
+  <div id="zones-container"></div>
+  <button type="button" class="btn" onclick="addZone()">+ Add Zone</button>
+
+
+  <h2>scanLists</h2>
+  <div id="scanLists-container"></div>
+  <button type="button" class="btn" onclick="addScanList()">+ Add Scan List</button>
+
+
+  <button type="button" class="btn" style="background-color: var(--accent-color); margin-top: 1.5rem;" onclick="generateYAML()">
+    Generate YML
+  </button>
+
+  <h2>Generated YML</h2>
+  <textarea id="yaml-output" readonly placeholder="Your YAML will appear here…"></textarea>
+
+
+  <div class="download-row">
+    <label for="yaml-filename">Filename</label>
+    <input type="text" id="yaml-filename" value="codeplug.yml" placeholder="myConfig.yml" />
+    <button type="button" class="btn" style="background-color: var(--accent-color);" onclick="downloadYAML()">
+      Download YML
+    </button>
+  </div>
+
+  <script>
+
+    function removeSelf(el) {
+      el.parentNode.remove();
+    }
+
+    let systemCount = 0;
+    function addSystem(existing = null) {
+      systemCount++;
+      const idx = systemCount;
+      const container = document.getElementById('systems-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `system-${idx}`;
+      fs.innerHTML = `
+        <legend>System ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <label for="system-name-${idx}">name</label>
+        <input type="text" name="system-name" id="system-name-${idx}" value="${existing?.name || ''}" placeholder="System Name" />
+
+        <label for="system-address-${idx}">address</label>
+        <input type="text" name="system-address" id="system-address-${idx}" value="${existing?.address || 'localhost'}" placeholder="e.g. localhost or 1.2.3.4" />
+
+        <label for="system-authKey-${idx}">authKey</label>
+        <input type="text" name="system-authKey" id="system-authKey-${idx}" value="${existing?.authKey || ''}" placeholder="Secret Key" />
+
+        <label for="system-port-${idx}">port</label>
+        <input type="number" name="system-port" id="system-port-${idx}" value="${existing?.port || 3000}" placeholder="e.g. 3000" />
+
+        <label for="system-rid-${idx}">rid</label>
+        <input type="text" name="system-rid" id="system-rid-${idx}" value="${existing?.rid || ''}" placeholder="(optional) rid or leave blank" />
+      `;
+      container.appendChild(fs);
+    }
+
+
+    let qcCount = 0;
+    function addQcEntry(existing = null) {
+      qcCount++;
+      const idx = qcCount;
+      const container = document.getElementById('qcList-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `qc-${idx}`;
+      fs.innerHTML = `
+        <legend>QC Entry ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <div class="horizontal-group">
+          <div class="small-inline">
+            <label for="qc-a-${idx}">a</label>
+            <input type="number" step="any" name="qc-a" id="qc-a-${idx}" value="${existing?.a ?? ''}" placeholder="e.g. 855.5" />
+          </div>
+          <div class="small-inline">
+            <label for="qc-b-${idx}">b</label>
+            <input type="number" step="any" name="qc-b" id="qc-b-${idx}" value="${existing?.b ?? ''}" placeholder="e.g. 349" />
+          </div>
+        </div>
+      `;
+      container.appendChild(fs);
+    }
+
+
+    let zoneCount = 0;
+    function addZone(existing = null) {
+      zoneCount++;
+      const idx = zoneCount;
+      const container = document.getElementById('zones-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `zone-${idx}`;
+      fs.innerHTML = `
+        <legend>Zone ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <label for="zone-name-${idx}">name</label>
+        <input type="text" name="zone-name" id="zone-name-${idx}" value="${existing?.name || ''}" placeholder="Zone Name" />
+        <div class="indent" id="zone-${idx}-channels"></div>
+        <button type="button" class="btn" onclick="addChannel(${idx})">+ Add Channel</button>
+      `;
+      container.appendChild(fs);
+
+      if (existing?.channels && Array.isArray(existing.channels)) {
+        existing.channels.forEach(ch => addChannel(idx, ch));
+      }
+    }
+
+    const channelCounters = {};
+    function addChannel(zoneIdx, existing = null) {
+      if (!channelCounters[zoneIdx]) channelCounters[zoneIdx] = 0;
+      channelCounters[zoneIdx]++;
+      const chIdx = channelCounters[zoneIdx];
+      const zoneDiv = document.getElementById(`zone-${zoneIdx}-channels`);
+      const fs = document.createElement('fieldset');
+      fs.style.backgroundColor = 'var(--surface-color)';
+      fs.style.border = '1px solid var(--border-color)';
+      fs.style.borderRadius = '6px';
+      fs.style.padding = '0.75rem 1rem';
+      fs.style.marginTop = '0.5rem';
+      fs.style.position = 'relative';
+      fs.id = `zone-${zoneIdx}-channel-${chIdx}`;
+      fs.innerHTML = `
+        <legend>Channel ${chIdx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+
+        <label for="channel-name-${zoneIdx}-${chIdx}">name</label>
+        <input type="text" name="channel-name" id="channel-name-${zoneIdx}-${chIdx}" value="${existing?.name || ''}" placeholder="Channel Name" />
+
+        <label for="channel-system-${zoneIdx}-${chIdx}">system</label>
+        <input type="text" name="channel-system" id="channel-system-${zoneIdx}-${chIdx}" value="${existing?.system || ''}" placeholder="System Name (must match a system above)" />
+
+        <label for="channel-tgid-${zoneIdx}-${chIdx}">tgid</label>
+        <input type="text" name="channel-tgid" id="channel-tgid-${zoneIdx}-${chIdx}" value="${existing?.tgid || ''}" placeholder="e.g. 2001" />
+
+        <label for="channel-scanList-${zoneIdx}-${chIdx}">scanList</label>
+        <input type="text" name="channel-scanList" id="channel-scanList-${zoneIdx}-${chIdx}" value="${existing?.scanList || ''}" placeholder="(optional) Scan List Name" />
+      `;
+      zoneDiv.appendChild(fs);
+    }
+
+
+    let scanListCount = 0;
+    function addScanList(existing = null) {
+      scanListCount++;
+      const idx = scanListCount;
+      const container = document.getElementById('scanLists-container');
+      const fs = document.createElement('fieldset');
+      fs.id = `scanList-${idx}`;
+      fs.innerHTML = `
+        <legend>Scan List ${idx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <label for="scanList-name-${idx}">name</label>
+        <input type="text" name="scanList-name" id="scanList-name-${idx}" value="${existing?.name || ''}" placeholder="List Name" />
+        <div class="indent" id="scanList-${idx}-channels"></div>
+        <button type="button" class="btn" onclick="addScanListChannel(${idx})">+ Add Channel to Scan List</button>
+      `;
+      container.appendChild(fs);
+
+      if (existing?.channels && Array.isArray(existing.channels)) {
+        existing.channels.forEach(ch => addScanListChannel(idx, ch));
+      }
+    }
+
+    const scanListChannelCount = {};
+    function addScanListChannel(slIdx, existing = null) {
+      if (!scanListChannelCount[slIdx]) scanListChannelCount[slIdx] = 0;
+      scanListChannelCount[slIdx]++;
+      const chIdx = scanListChannelCount[slIdx];
+      const slDiv = document.getElementById(`scanList-${slIdx}-channels`);
+      const fs = document.createElement('fieldset');
+      fs.style.backgroundColor = 'var(--surface-color)';
+      fs.style.border = '1px solid var(--border-color)';
+      fs.style.borderRadius = '6px';
+      fs.style.padding = '0.75rem 1rem';
+      fs.style.marginTop = '0.5rem';
+      fs.style.position = 'relative';
+      fs.id = `scanList-${slIdx}-ch-${chIdx}`;
+      fs.innerHTML = `
+        <legend>Entry ${chIdx}</legend>
+        <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
+        <label for="sl-zone-${slIdx}-${chIdx}">zone</label>
+        <input type="text" name="sl-zone" id="sl-zone-${slIdx}-${chIdx}" value="${existing?.zone || ''}" placeholder="Zone Name" />
+
+        <label for="sl-channel-${slIdx}-${chIdx}">channel</label>
+        <input type="text" name="sl-channel" id="sl-channel-${slIdx}-${chIdx}" value="${existing?.channel || ''}" placeholder="Channel Name" />
+      `;
+      slDiv.appendChild(fs);
+    }
+
+
+    function generateYAML() {
+      try {
+
+        function esc(str) {
+          return String(str).replace(/"/g, '\\"');
+        }
+
+   
+        const rwAliasElem  = document.getElementById('rw-radioAlias');
+        const rwAlias      = rwAliasElem ? rwAliasElem.value.trim() : '';
+        const rwSerialElem = document.getElementById('rw-serialNumber');
+        const rwSerial     = rwSerialElem ? rwSerialElem.value.trim() : '';
+        const rwModelElem  = document.getElementById('rw-model');
+        const rwModel      = rwModelElem ? rwModelElem.value.trim() : '';
+        const rwInCarElem  = document.getElementById('rw-inCarMode');
+        const rwInCar      = rwInCarElem ? rwInCarElem.value.trim() : '';
+
+        let yaml = '';
+        yaml += 'radioWide:\n';
+        yaml += '  hostVersion: "R01.00.00"\n';
+        yaml += '  codeplugVersion: "R01.00.00"\n';
+        yaml += `  radioAlias: "${esc(rwAlias)}"\n`;
+        yaml += `  serialNumber: "${esc(rwSerial)}"\n`;
+        yaml += `  model: "${esc(rwModel)}"\n`;
+        yaml += `  inCarMode: "${esc(rwInCar)}"\n\n`;
+
+
+        yaml += 'systems:\n';
+        const systemFieldsets = document.querySelectorAll('#systems-container fieldset');
+        if (systemFieldsets.length === 0) {
+          yaml += '  []\n\n';
+        } else {
+          systemFieldsets.forEach(fs => {
+            const nameElem    = fs.querySelector('input[name="system-name"]');
+            const addrElem    = fs.querySelector('input[name="system-address"]');
+            const keyElem     = fs.querySelector('input[name="system-authKey"]');
+            const portElem    = fs.querySelector('input[name="system-port"]');
+            const ridElem     = fs.querySelector('input[name="system-rid"]');
+            const name        = nameElem    ? nameElem.value.trim()    : '';
+            const address     = addrElem    ? addrElem.value.trim()    : '';
+            const authKey     = keyElem     ? keyElem.value.trim()     : '';
+            const portVal     = portElem    ? portElem.value.trim()    : '';
+            const rid         = ridElem     ? ridElem.value.trim()     : '';
+
+           
+            if (!name && !address && !authKey && !portVal && !rid) return;
+
+            yaml += '  - name: "' + esc(name) + '"\n';
+            yaml += '    address: "' + esc(address) + '"\n';
+            yaml += '    authKey: "' + esc(authKey) + '"\n';
+            yaml += '    port: ' + (portVal === '' ? 'null' : Number(portVal)) + '\n';
+            yaml += '    rid: ' + (rid === '' ? 'null' : '"' + esc(rid) + '"') + '\n';
+          });
+          yaml += '\n';
+        }
+
+  
+        yaml += 'qcList:\n';
+        const qcFieldsets = document.querySelectorAll('#qcList-container fieldset');
+        if (qcFieldsets.length === 0) {
+          yaml += '  []\n\n';
+        } else {
+          qcFieldsets.forEach(fs => {
+            const aElem = fs.querySelector('input[name="qc-a"]');
+            const bElem = fs.querySelector('input[name="qc-b"]');
+            const aVal  = aElem ? aElem.value.trim() : '';
+            const bVal  = bElem ? bElem.value.trim() : '';
+            if (aVal === '' && bVal === '') return;
+            yaml += '  - a: ' + (aVal === '' ? 'null' : Number(aVal)) + '\n';
+            yaml += '    b: ' + (bVal === '' ? 'null' : Number(bVal)) + '\n';
+          });
+          yaml += '\n';
+        }
+
+       
+        yaml += 'zones:\n';
+        const zoneFieldsets = document.querySelectorAll('#zones-container fieldset[id^="zone-"]');
+        if (zoneFieldsets.length === 0) {
+          yaml += '  []\n\n';
+        } else {
+          zoneFieldsets.forEach(fsZone => {
+            const zoneNameElem = fsZone.querySelector('input[name="zone-name"]');
+            const zoneName     = zoneNameElem ? zoneNameElem.value.trim() : '';
+            if (!zoneName) return; 
+
+            yaml += '  - name: "' + esc(zoneName) + '"\n';
+            yaml += '    channels:\n';
+
+            const parts      = fsZone.id.split('-'); 
+            const zoneIdx    = parts[1];
+            const channelFSs = document.querySelectorAll(`#zone-${zoneIdx}-channels fieldset`);
+            if (channelFSs.length === 0) {
+              yaml += '      []\n';
+            } else {
+              channelFSs.forEach(chFS => {
+                const chNameElem   = chFS.querySelector('input[name="channel-name"]');
+                const chSystemElem = chFS.querySelector('input[name="channel-system"]');
+                const chTgidElem   = chFS.querySelector('input[name="channel-tgid"]');
+                const chScanElem   = chFS.querySelector('input[name="channel-scanList"]');
+                const chName       = chNameElem   ? chNameElem.value.trim()   : '';
+                const chSystem     = chSystemElem ? chSystemElem.value.trim() : '';
+                const chTgid       = chTgidElem   ? chTgidElem.value.trim()   : '';
+                const chScan       = chScanElem   ? chScanElem.value.trim()   : '';
+
+             
+                if (!chName && !chSystem && !chTgid && !chScan) return;
+                yaml += '      - name: "' + esc(chName) + '"\n';
+                yaml += '        system: "' + esc(chSystem) + '"\n';
+                yaml += '        tgid: "' + esc(chTgid) + '"\n';
+                if (chScan !== '') {
+                  yaml += '        scanList: "' + esc(chScan) + '"\n';
+                }
+              });
+            }
+          });
+          yaml += '\n';
+        }
+
+       
+        yaml += 'scanLists:\n';
+        const slFieldsets = document.querySelectorAll('#scanLists-container fieldset[id^="scanList-"]');
+        if (slFieldsets.length === 0) {
+          yaml += '  []\n';
+        } else {
+          slFieldsets.forEach(fsSL => {
+            const slNameElem = fsSL.querySelector('input[name="scanList-name"]');
+            const slName     = slNameElem ? slNameElem.value.trim() : '';
+            if (!slName) return;
+
+            yaml += '  - name: "' + esc(slName) + '"\n';
+            yaml += '    channels:\n';
+
+            const parts   = fsSL.id.split('-'); 
+            const slIdx   = parts[1];
+            const slChFSs = document.querySelectorAll(`#scanList-${slIdx}-channels fieldset`);
+            if (slChFSs.length === 0) {
+              yaml += '      []\n';
+            } else {
+              slChFSs.forEach(chFS => {
+                const slZoneElem    = chFS.querySelector('input[name="sl-zone"]');
+                const slChannelElem = chFS.querySelector('input[name="sl-channel"]');
+                const slZone        = slZoneElem    ? slZoneElem.value.trim()    : '';
+                const slChannel     = slChannelElem ? slChannelElem.value.trim() : '';
+                if (!slZone && !slChannel) return;
+                yaml += '      - zone: "' + esc(slZone) + '"\n';
+                yaml += '        channel: "' + esc(slChannel) + '"\n';
+              });
+            }
+          });
+        }
+
+      
+        if (!yaml.trim()) {
+          alert('No YAML content was generated. Make sure you filled out at least one section.');
+        }
+
+      
+        document.getElementById('yaml-output').value = yaml;
+      }
+      catch (e) {
+       
+        alert('Error generating YML: ' + e.message);
+      }
+    }
+
+ 
+    function downloadYAML() {
+      const contentElem = document.getElementById('yaml-output');
+      const content     = contentElem ? contentElem.value : '';
+      if (!content) {
+        alert('Please click "Generate YML" first.');
+        return;
+      }
+      let filenameElem = document.getElementById('yaml-filename');
+      let filename     = filenameElem ? filenameElem.value.trim() : '';
+      if (!filename) {
+        alert('Please enter a filename (e.g. myConfig.yaml).');
+        return;
+      }
+     
+      if (!filename.toLowerCase().endsWith('.yml') && !filename.toLowerCase().endsWith('.yml')) {
+        filename += '.yml';
+      }
+
+      const blob = new Blob([content], { type: 'text/yaml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      addSystem();
+      addQcEntry();
+      addZone();
+      addChannel(1);
+      addScanList();
+      addScanListChannel(1);
+    });
+  </script>
+</body>
+</html>
