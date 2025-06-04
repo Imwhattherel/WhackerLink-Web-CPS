@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Whackerlink CPS - Console</title>
   <style>
-
     :root {
       --bg-color: #121212;
       --surface-color: #1f1f1f;
@@ -12,9 +11,9 @@
       --border-color: #3a3a3a;
       --text-color: #e0e0e0;
       --muted-text: #a0a0a0;
-      --accent-color: #ffffff;       
+      --accent-color: #ffffff;
       --accent-hover: #ffffff;
-      --error-color: #cf6679;       
+      --error-color: #cf6679;
       --button-bg: #ffffff;
       --button-hover: #ffffff;
       --remove-btn-bg: #cf6679;
@@ -24,7 +23,6 @@
       --textarea-bg: #1f1f1f;
       --textarea-border: #444;
     }
-
 
     * {
       box-sizing: border-box;
@@ -55,7 +53,6 @@
       color: var(--text-color);
     }
 
-  
     label {
       display: block;
       font-size: 0.9rem;
@@ -86,25 +83,21 @@
       color: var(--muted-text);
     }
 
-   
     fieldset {
-      background-color: var(--panel-color);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 1rem 1.2rem 1.2rem;  
+      padding: 1rem 1.2rem 1.2rem;
       margin-bottom: 1rem;
-      position: relative;           
+      position: relative;
     }
     fieldset legend {
       position: absolute;
-      top: -0.6rem;                 
-      left: 1rem;                   
-      background-color: var(--panel-color);
-      padding: 0 0.5rem;           
+      top: -0.6rem;
+      left: 1rem;
+      padding: 0 0.5rem;
       font-weight: bold;
       font-size: 1rem;
     }
-
 
     .btn {
       display: inline-block;
@@ -142,7 +135,6 @@
       background-color: var(--remove-btn-hover);
     }
 
-    
     .horizontal-group {
       display: flex;
       gap: 2%;
@@ -158,7 +150,6 @@
       margin-top: 0.75rem;
     }
 
-    
     textarea {
       background-color: var(--textarea-bg);
       border: 1px solid var(--textarea-border);
@@ -176,7 +167,6 @@
       color: var(--muted-text);
     }
 
-   
     .download-row {
       margin-top: 0.5rem;
       display: flex;
@@ -201,29 +191,27 @@
 <body>
   <h1>Whackerlink Console CPS</h1>
 
+ 
+  <h2>Import Existing YML</h2>
+  <label for="yaml-input">Choose a .yml or .yaml file</label>
+  <input type="file" id="yaml-input" accept=".yml,.yaml" />
+  <button type="button" class="btn" onclick="importYAML()">Import YML</button>
 
+ 
   <h2>radioWide</h2>
   <fieldset id="radioWide-section">
     <legend>General Radio Info</legend>
-
     <label for="rw-hostVersion">hostVersion</label>
     <input type="text" id="rw-hostVersion" value="R01.00.00" readonly />
-
     <label for="rw-codeplugVersion">codeplugVersion</label>
     <input type="text" id="rw-codeplugVersion" value="R01.00.00" readonly />
-
     <label for="rw-radioAlias">radioAlias</label>
     <input type="text" id="rw-radioAlias" placeholder="e.g. MyRadio" value="" />
-
     <label for="rw-serialNumber">serialNumber</label>
     <input type="text" id="rw-serialNumber" value="123ABC1234" />
-
     <label for="rw-model">model</label>
- 
     <input type="text" id="rw-model" value="CONSOLE" readonly />
-
     <label for="rw-inCarMode">inCarMode</label>
-  
     <input type="text" id="rw-inCarMode" value="N/A" readonly />
   </fieldset>
 
@@ -232,20 +220,23 @@
   <div id="systems-container"></div>
   <button type="button" class="btn" onclick="addSystem()">+ Add System</button>
 
+  
   <h2>zones</h2>
   <div id="zones-container"></div>
   <button type="button" class="btn" onclick="addZone()">+ Add Zone</button>
 
- 
-  <button type="button" class="btn" style="background-color: var(--accent-color); margin-top: 1.5rem;" onclick="generateYAML()">
+
+  <button type="button" class="btn"
+          style="background-color: var(--accent-color); margin-top: 1.5rem;"
+          onclick="generateYAML()">
     Generate YML
   </button>
 
-
+  
   <h2>Generated YML</h2>
   <textarea id="yaml-output" readonly placeholder="Your YAML will appear here…"></textarea>
 
-  <!-- FILENAME + DOWNLOAD -->
+  
   <div class="download-row">
     <label for="yaml-filename">Filename</label>
     <input type="text" id="yaml-filename" value="codeplug.yml" placeholder="myConfig.yml" />
@@ -254,14 +245,21 @@
     </button>
   </div>
 
-  <script>
   
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script>
+   
+    function esc(str) {
+      return String(str).replace(/"/g, '\\"');
+    }
     function removeSelf(el) {
       el.parentNode.remove();
     }
 
-  
+    
     let systemCount = 0;
+
+    
     function addSystem(existing = null) {
       systemCount++;
       const idx = systemCount;
@@ -273,27 +271,34 @@
         <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
 
         <label for="system-name-${idx}">name</label>
-        <input type="text" name="system-name" id="system-name-${idx}" value="${existing?.name || ''}" placeholder="System Name" />
+        <input type="text" name="system-name" id="system-name-${idx}"
+               value="${existing?.name || ''}" placeholder="System Name" />
 
         <label for="system-address-${idx}">address</label>
-        <input type="text" name="system-address" id="system-address-${idx}" value="${existing?.address || 'localhost'}" placeholder="e.g. localhost or 1.2.3.4" />
+        <input type="text" name="system-address" id="system-address-${idx}"
+               value="${existing?.address || 'localhost'}" placeholder="e.g. localhost or 1.2.3.4" />
 
         <label for="system-port-${idx}">port</label>
-        <input type="number" name="system-port" id="system-port-${idx}" value="${existing?.port || 3000}" placeholder="e.g. 3000" />
+        <input type="number" name="system-port" id="system-port-${idx}"
+               value="${existing?.port || 3000}" placeholder="e.g. 3000" />
 
         <label for="system-authKey-${idx}">authKey</label>
-        <input type="text" name="system-authKey" id="system-authKey-${idx}" value="${existing?.authKey || ''}" placeholder="Secret Key" />
+        <input type="text" name="system-authKey" id="system-authKey-${idx}"
+               value="${existing?.authKey || ''}" placeholder="Secret Key" />
 
         <label for="system-rid-${idx}">rid</label>
-        <input type="text" name="system-rid" id="system-rid-${idx}" value="${existing?.rid || ''}" placeholder="rid" />
+        <input type="text" name="system-rid" id="system-rid-${idx}"
+               value="${existing?.rid || ''}" placeholder="rid" />
 
         <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
           <label for="system-peerId-${idx}">peerId</label>
-          <input type="number" name="system-peerId" id="system-peerId-${idx}" value="${existing?.peerId || ''}" placeholder="(optional) peerId" style="width: 100%;" />
+          <input type="number" name="system-peerId" id="system-peerId-${idx}"
+                 value="${existing?.peerId || ''}" placeholder="(optional) peerId" style="width: 100%;" />
         </div>
 
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-          <input type="checkbox" id="system-isDvm-${idx}" name="system-isDvm" ${existing?.isDvm ? 'checked' : ''} />
+          <input type="checkbox" id="system-isDvm-${idx}" name="system-isDvm"
+                 ${existing?.isDvm ? 'checked' : ''} />
           <label for="system-isDvm-${idx}" style="display: inline; margin:0; font-size:0.9rem; color:var(--muted-text);">
             isDvm
           </label>
@@ -304,10 +309,12 @@
           <legend>Site</legend>
 
           <label for="site-name-${idx}">site.name</label>
-          <input type="text" name="site-name" id="site-name-${idx}" value="${existing?.site?.name || ''}" placeholder="Central Site" />
+          <input type="text" name="site-name" id="site-name-${idx}"
+                 value="${existing?.site?.name || 'Central Site'}" placeholder="Central Site" />
 
           <label for="site-controlChannel-${idx}">site.controlChannel</label>
-          <input type="text" name="site-controlChannel" id="site-controlChannel-${idx}" value="${existing?.site?.controlChannel || ''}" placeholder="e.g. 772.74375" />
+          <input type="text" name="site-controlChannel" id="site-controlChannel-${idx}"
+                 value="${existing?.site?.controlChannel || '772.74375'}" placeholder="e.g. 772.74375" />
 
           <!-- voiceChannels array -->
           <div id="system-${idx}-voiceChannels-container" style="margin-top:0.5rem;"></div>
@@ -316,33 +323,35 @@
             + Add Voice Channel
           </button>
 
-          <!-- Location Sub-block -->
+          <!-- Location Sub-block (AUTO-FILLED defaults) -->
           <fieldset style="margin-top: 1rem; background-color: var(--surface-color);">
             <legend>location</legend>
             <label for="site-loc-x-${idx}">x</label>
             <input type="number" step="any" name="site-loc-x" id="site-loc-x-${idx}"
-                   value="${existing?.site?.location?.x || ''}" placeholder="e.g. 757.89" />
+                   value="${existing?.site?.location?.x != null ? existing.site.location.x : '757.89'}" />
 
             <label for="site-loc-y-${idx}">y</label>
             <input type="number" step="any" name="site-loc-y" id="site-loc-y-${idx}"
-                   value="${existing?.site?.location?.y || ''}" placeholder="e.g. 1274.17" />
+                   value="${existing?.site?.location?.y != null ? existing.site.location.y : '1274.17'}" />
 
             <label for="site-loc-z-${idx}">z</label>
             <input type="number" step="any" name="site-loc-z" id="site-loc-z-${idx}"
-                   value="${existing?.site?.location?.z || ''}" placeholder="e.g. 360.3" />
+                   value="${existing?.site?.location?.z != null ? existing.site.location.z : '360.3'}" />
           </fieldset>
 
           <label for="site-systemID-${idx}" style="margin-top:1rem;">site.systemID</label>
           <input type="number" name="site-systemID" id="site-systemID-${idx}"
-                 value="${existing?.site?.systemID || ''}" placeholder="e.g. 1" />
+                 value="${existing?.site?.systemID != null ? existing.site.systemID : idx}" />
 
           <label for="site-siteID-${idx}">site.siteID</label>
           <input type="number" name="site-siteID" id="site-siteID-${idx}"
-                 value="${existing?.site?.siteID || ''}" placeholder="e.g. 1" />
+                 value="${existing?.site?.siteID != null ? existing.site.siteID : idx}"
+                 placeholder="e.g. 1" />
 
           <label for="site-range-${idx}">site.range</label>
           <input type="number" step="any" name="site-range" id="site-range-${idx}"
-                 value="${existing?.site?.range || ''}" placeholder="e.g. 1.5" />
+                 value="${existing?.site?.range != null ? existing.site.range : 1.5}"
+                 placeholder="e.g. 1.5" />
         </fieldset>
       `;
       container.appendChild(fs);
@@ -353,7 +362,7 @@
       }
     }
 
-   
+  
     const voiceChannelCounters = {};
     function addVoiceChannel(systemIdx, existingValue = '') {
       if (!voiceChannelCounters[systemIdx]) voiceChannelCounters[systemIdx] = 0;
@@ -373,7 +382,7 @@
       vcContainer.appendChild(div);
     }
 
-  
+    
     let zoneCount = 0;
     function addZone(existing = null) {
       zoneCount++;
@@ -384,22 +393,18 @@
       fs.innerHTML = `
         <legend>Zone ${idx}</legend>
         <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
-
         <label for="zone-name-${idx}">name</label>
-        <input type="text" name="zone-name" id="zone-name-${idx}" value="${existing?.name || ''}" placeholder="Zone Name" />
-
+        <input type="text" name="zone-name" id="zone-name-${idx}"
+               value="${existing?.name || ''}" placeholder="Zone Name" />
         <div class="indent" id="zone-${idx}-channels"></div>
         <button type="button" class="btn" onclick="addZoneChannel(${idx})">+ Add Channel</button>
       `;
       container.appendChild(fs);
 
-  
       if (existing?.channels && Array.isArray(existing.channels)) {
         existing.channels.forEach(ch => addZoneChannel(idx, ch));
       }
     }
-
-  
     const zoneChannelCounters = {};
     function addZoneChannel(zoneIdx, existing = null) {
       if (!zoneChannelCounters[zoneIdx]) zoneChannelCounters[zoneIdx] = 0;
@@ -417,37 +422,31 @@
       fs.innerHTML = `
         <legend>Channel ${chIdx}</legend>
         <button type="button" class="btn-remove" onclick="removeSelf(this)">✕</button>
-
         <label for="zone-${zoneIdx}-channel-name-${chIdx}">name</label>
-        <input type="text" name="channel-name" id="zone-${zoneIdx}-channel-name-${chIdx}" value="${existing?.name || ''}" placeholder="Channel Name" />
-
+        <input type="text" name="channel-name" id="zone-${zoneIdx}-channel-name-${chIdx}"
+               value="${existing?.name || ''}" placeholder="Channel Name" />
         <label for="zone-${zoneIdx}-channel-system-${chIdx}">system</label>
-        <input type="text" name="channel-system" id="zone-${zoneIdx}-channel-system-${chIdx}" value="${existing?.system || ''}" placeholder="System Name" />
-
+        <input type="text" name="channel-system" id="zone-${zoneIdx}-channel-system-${chIdx}"
+               value="${existing?.system || ''}" placeholder="System Name" />
         <label for="zone-${zoneIdx}-channel-tgid-${chIdx}">tgid</label>
-        <input type="text" name="channel-tgid" id="zone-${zoneIdx}-channel-tgid-${chIdx}" value="${existing?.tgid || ''}" placeholder="e.g. 2001" />
-
+        <input type="text" name="channel-tgid" id="zone-${zoneIdx}-channel-tgid-${chIdx}"
+               value="${existing?.tgid || ''}" placeholder="e.g. 2001" />
         <label for="zone-${zoneIdx}-channel-keyId-${chIdx}">keyId</label>
-        <input type="text" name="channel-keyId" id="zone-${zoneIdx}-channel-keyId-${chIdx}" value="${existing?.keyId || ''}" placeholder="e.g. 0x50" />
-
+        <input type="text" name="channel-keyId" id="zone-${zoneIdx}-channel-keyId-${chIdx}"
+               value="${existing?.keyId || ''}" placeholder="e.g. 0x50" />
         <label for="zone-${zoneIdx}-channel-algoId-${chIdx}">algoId</label>
-        <input type="text" name="channel-algoId" id="zone-${zoneIdx}-channel-algoId-${chIdx}" value="${existing?.algoId || ''}" placeholder="e.g. 0xaa" />
-
+        <input type="text" name="channel-algoId" id="zone-${zoneIdx}-channel-algoId-${chIdx}"
+               value="${existing?.algoId || ''}" placeholder="e.g. 0xaa" />
         <label for="zone-${zoneIdx}-channel-encryptionKey-${chIdx}">encryptionKey</label>
-        <input type="text" name="channel-encryptionKey" id="zone-${zoneIdx}-channel-encryptionKey-${chIdx}" value="${existing?.encryptionKey || ''}" placeholder="(optional) encryption key"/>
+        <input type="text" name="channel-encryptionKey" id="zone-${zoneIdx}-channel-encryptionKey-${chIdx}"
+               value="${existing?.encryptionKey || ''}" placeholder="(optional) encryption key"/>
       `;
       zoneDiv.appendChild(fs);
     }
 
-   
+    
     function generateYAML() {
       try {
-    
-        function esc(str) {
-          return String(str).replace(/"/g, '\\"');
-        }
-
-    
         const rwAliasElem  = document.getElementById('rw-radioAlias');
         const rwAlias      = rwAliasElem ? rwAliasElem.value.trim() : '';
         const rwSerialElem = document.getElementById('rw-serialNumber');
@@ -466,14 +465,13 @@
         yaml += `  model: "${esc(rwModel)}"\n`;
         yaml += `  inCarMode: "${esc(rwInCar)}"\n\n`;
 
-    
         yaml += 'systems:\n';
         const systemFieldsets = document.querySelectorAll('#systems-container fieldset[id^="system-"]');
         if (systemFieldsets.length === 0) {
           yaml += '  []\n';
         } else {
           systemFieldsets.forEach(fsSys => {
-            const parts = fsSys.id.split('-'); 
+            const parts = fsSys.id.split('-');
             const sysIdx = parts[1];
 
             const nameElem    = fsSys.querySelector('input[name="system-name"]');
@@ -492,7 +490,6 @@
             const peerId   = peerElem    ? peerElem.value.trim()    : '';
             const isDvm    = isDvmElem   ? isDvmElem.checked         : false;
 
-            
             if (!name && !address && !portVal && !authKey && !rid && !peerId && !isDvm) return;
 
             yaml += '  - name: "' + esc(name) + '"\n';
@@ -530,7 +527,7 @@
               });
             }
 
-          
+           
             yaml += '      location:\n';
             const lxElem = fsSys.querySelector('input[name="site-loc-x"]');
             const lyElem = fsSys.querySelector('input[name="site-loc-y"]');
@@ -543,12 +540,12 @@
             yaml += '        z: ' + (lz === '' ? 'null' : Number(lz)) + '\n';
 
             
-            const sSysIDElem = fsSys.querySelector('input[name="site-systemID"]');
-            const sSiteIDElem= fsSys.querySelector('input[name="site-siteID"]');
-            const sRangeElem = fsSys.querySelector('input[name="site-range"]');
-            const sSysID     = sSysIDElem  ? sSysIDElem.value.trim()  : '';
-            const sSiteID    = sSiteIDElem ? sSiteIDElem.value.trim() : '';
-            const sRange     = sRangeElem  ? sRangeElem.value.trim()  : '';
+            const sSysIDElem  = fsSys.querySelector('input[name="site-systemID"]');
+            const sSiteIDElem = fsSys.querySelector('input[name="site-siteID"]');
+            const sRangeElem  = fsSys.querySelector('input[name="site-range"]');
+            const sSysID      = sSysIDElem  ? sSysIDElem.value.trim()  : '';
+            const sSiteID     = sSiteIDElem ? sSiteIDElem.value.trim() : '';
+            const sRange      = sRangeElem  ? sRangeElem.value.trim()  : '';
             yaml += '      systemID: ' + (sSysID === '' ? 'null' : Number(sSysID)) + '\n';
             yaml += '      siteID: '   + (sSiteID === '' ? 'null' : Number(sSiteID)) + '\n';
             yaml += '      range: '    + (sRange === '' ? 'null' : Number(sRange)) + '\n';
@@ -563,10 +560,10 @@
           yaml += '  []\n';
         } else {
           zoneFieldsets.forEach(fsZone => {
-            const zParts   = fsZone.id.split('-'); 
-            const zIdx     = zParts[1];
-            const zNameElem= fsZone.querySelector('input[name="zone-name"]');
-            const zName    = zNameElem ? zNameElem.value.trim() : '';
+            const zParts    = fsZone.id.split('-');
+            const zIdx      = zParts[1];
+            const zNameElem = fsZone.querySelector('input[name="zone-name"]');
+            const zName     = zNameElem ? zNameElem.value.trim() : '';
             if (!zName) return;
             yaml += '  - name: "' + esc(zName) + '"\n';
             yaml += '    channels:\n';
@@ -589,7 +586,7 @@
                 const cKey     = cKeyElem  ? cKeyElem.value.trim()     : '';
                 const cAlgo    = cAlgoElem ? cAlgoElem.value.trim()    : '';
                 const cEnc     = cEncElem  ? cEncElem.value.trim()     : '';
-
+                
                 if (!cName && !cSys && !cTgid && !cKey && !cAlgo && !cEnc) return;
                 yaml += '      - name: "' + esc(cName) + '"\n';
                 yaml += '        system: "' + esc(cSys) + '"\n';
@@ -607,8 +604,8 @@
             }
           });
         }
+        yaml += '\n';
 
-        
         if (!yaml.trim()) {
           alert('No YAML content was generated. Make sure you filled out at least one section.');
         }
@@ -619,7 +616,6 @@
       }
     }
 
- 
     function downloadYAML() {
       const contentElem = document.getElementById('yaml-output');
       const content     = contentElem ? contentElem.value : '';
@@ -633,7 +629,7 @@
         alert('Please enter a filename (e.g. myConfig.yml).');
         return;
       }
-      if (!filename.toLowerCase().endsWith('.yml') && !filename.toLowerCase().endsWith('.yml')) {
+      if (!filename.toLowerCase().endsWith('.yml') && !filename.toLowerCase().endsWith('.yaml')) {
         filename += '.yml';
       }
 
@@ -648,7 +644,92 @@
       URL.revokeObjectURL(url);
     }
 
-   
+    
+    function importYAML() {
+      const input = document.getElementById('yaml-input');
+      if (!input.files || !input.files[0]) {
+        alert('Please select a .yml or .yaml file to import.');
+        return;
+      }
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result;
+          const data = jsyaml.load(text);
+
+          if (typeof data !== 'object' || data === null) {
+            alert('Imported file does not contain a valid YAML mapping.');
+            return;
+          }
+
+          
+          document.getElementById('rw-radioAlias').value   = data.radioWide?.radioAlias || '';
+          document.getElementById('rw-serialNumber').value = data.radioWide?.serialNumber || '';
+  
+          const sysContainer = document.getElementById('systems-container');
+          sysContainer.innerHTML = '';
+          systemCount = 0;
+          for (let key in voiceChannelCounters) delete voiceChannelCounters[key];
+
+          
+          const zonesContainer = document.getElementById('zones-container');
+          zonesContainer.innerHTML = '';
+          zoneCount = 0;
+          for (let key in zoneChannelCounters) delete zoneChannelCounters[key];
+
+          
+          if (Array.isArray(data.systems)) {
+            data.systems.forEach(sys => {
+              addSystem({
+                name: sys.name || '',
+                address: sys.address || '',
+                port: sys.port != null ? sys.port : 3000,
+                authKey: sys.authKey || '',
+                rid: sys.rid || '',
+                peerId: sys.peerId != null ? sys.peerId : '',
+                isDvm: !!sys.isDvm,
+                site: {
+                  name: sys.site?.name || '',
+                  controlChannel: sys.site?.controlChannel || '',
+                  voiceChannels: Array.isArray(sys.site?.voiceChannels) ? sys.site.voiceChannels : [],
+                  location: {
+                    x: sys.site?.location?.x != null ? sys.site.location.x : null,
+                    y: sys.site?.location?.y != null ? sys.site.location.y : null,
+                    z: sys.site?.location?.z != null ? sys.site.location.z : null
+                  },
+                  systemID: sys.site?.systemID != null ? sys.site.systemID : null,
+                  siteID: sys.site?.siteID != null ? sys.site.siteID : null,
+                  range: sys.site?.range != null ? sys.site.range : null
+                }
+              });
+            });
+          }
+
+          
+          if (Array.isArray(data.zones)) {
+            data.zones.forEach(z => {
+              addZone({
+                name: z.name || '',
+                channels: Array.isArray(z.channels) ? z.channels : []
+              });
+            });
+          }
+
+          alert('Import successful! The form has been populated from your YML.');
+        }
+        catch (err) {
+          console.error(err);
+          alert('Failed to parse/import YAML: ' + err.message);
+        }
+      };
+      reader.onerror = function() {
+        alert('Error reading the file.');
+      };
+      reader.readAsText(file);
+    }
+
+    
     window.addEventListener('DOMContentLoaded', () => {
       addSystem();
       addZone();
