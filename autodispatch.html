@@ -67,7 +67,6 @@
       padding: 1rem 1.2rem 1.2rem;
       margin-bottom: 1rem;
       position: relative;
-
     }
     fieldset legend {
       position: absolute;
@@ -151,6 +150,11 @@
   <h1>Fire Dispatch YAML Builder</h1>
 
 
+  <h2>Import Existing YML</h2>
+  <label for="yaml-input">Choose a .yml or .yaml file</label>
+  <input type="file" id="yaml-input" accept=".yml,.yaml" />
+  <button class="btn" onclick="importYAML()">Import YML</button>
+
   <h2>General</h2>
   <fieldset>
     <legend>General</legend>
@@ -164,11 +168,9 @@
     </div>
   </fieldset>
 
-
   <h2>channels</h2>
   <div id="channels-container"></div>
   <button class="btn" onclick="addChannel()">+ Add Channel</button>
-
 
   <h2>network</h2>
   <fieldset id="network-section">
@@ -182,7 +184,6 @@
     <label for="net-srcId">srcId</label>
     <input type="number" id="net-srcId" value="192" placeholder="192" />
 
-
     <fieldset style="margin-top:1rem;">
       <legend>site</legend>
       <label for="site-name">site.name</label>
@@ -195,7 +196,6 @@
       <input type="text" id="site-systemID" value="1" placeholder="1" />
     </fieldset>
   </fieldset>
-
 
   <h2>dvm</h2>
   <fieldset id="dvm-section">
@@ -212,7 +212,6 @@
     <input type="number" id="dvm-port" value="32001" placeholder="32001" />
   </fieldset>
 
-
   <h2>ttsConfig</h2>
   <fieldset id="tts-section">
     <legend>ttsConfig</legend>
@@ -221,7 +220,6 @@
     <label for="tts-rate">rate</label>
     <input type="number" id="tts-rate" value="10" placeholder="10" />
   </fieldset>
-
 
   <h2>imperial</h2>
   <fieldset id="imp-section">
@@ -236,19 +234,16 @@
     <input type="text" id="imp-apiKey" placeholder="API_KEY" value="API_KEY" />
   </fieldset>
 
-
   <h2>fields</h2>
   <div id="fields-container"></div>
   <button class="btn" onclick="addField()">+ Add Field</button>
 
-  
   <button class="btn" style="background:var(--accent)" onclick="generateYAML()">
     Generate YML
   </button>
   <h2>Generated YML</h2>
   <textarea id="yaml-output" readonly placeholder="Your YAML will appear here…"></textarea>
 
-  
   <div class="download-row">
     <label for="filename">Filename</label>
     <input type="text" id="filename" value="dispatch.yml" placeholder="myConfig.yml" />
@@ -257,13 +252,14 @@
     </button>
   </div>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
   <script>
- 
     function removeSelf(el) {
       el.parentNode.remove();
     }
 
-    
     let channelCount = 0;
     function addChannel(existing = null) {
       channelCount++;
@@ -282,8 +278,8 @@
       container.appendChild(fs);
     }
 
-    
     let fieldCount = 0;
+    const optionCounters = {};
     function addField(existing = null) {
       fieldCount++;
       const idx = fieldCount;
@@ -312,13 +308,13 @@
         </div>
 
         <label for="field-sep-${idx}" style="margin-top:0.5rem;">separator</label>
-        <input type="text" id="field-sep-${idx}" name="field-separator" value="${existing?.separator || ''}" placeholder="..."/>
+        <input type="text" id="field-sep-${idx}" name="field-separator" value="${existing?.separator || ''}" placeholder="..." />
 
         <label for="field-ender-${idx}">ender</label>
-        <input type="text" id="field-ender-${idx}" name="field-ender" value="${existing?.ender || ''}" placeholder="... "/>
+        <input type="text" id="field-ender-${idx}" name="field-ender" value="${existing?.ender || ''}" placeholder="... " />
 
         <label for="field-said-${idx}">saidName</label>
-        <input type="text" id="field-said-${idx}" name="field-saidName" value="${existing?.saidName || ''}" placeholder="Respond on"/>
+        <input type="text" id="field-said-${idx}" name="field-saidName" value="${existing?.saidName || ''}" placeholder="Respond on" />
 
         <label style="margin-top:0.5rem;">
           <input type="checkbox" id="field-includeName-${idx}" name="field-includeFieldName" ${existing?.includeFieldName ? 'checked' : ''} />
@@ -332,13 +328,11 @@
       `;
       container.appendChild(fs);
 
-    
       if (existing?.options && Array.isArray(existing.options)) {
         existing.options.forEach(opt => addOption(idx, opt));
       }
     }
 
-    const optionCounters = {};
     function addOption(fieldIdx, existing = '') {
       if (!optionCounters[fieldIdx]) optionCounters[fieldIdx] = 0;
       optionCounters[fieldIdx]++;
@@ -356,7 +350,6 @@
       optContainer.appendChild(div);
     }
 
-  
     window.addEventListener('DOMContentLoaded', () => {
       addChannel({ name:"Channel 1", dstId:"2001" });
       addChannel({ name:"Channel 2", dstId:"2002" });
@@ -391,12 +384,10 @@
       });
     });
 
-    
     function generateYAML() {
       try {
         function esc(s){ return String(s).replace(/"/g,'\\"'); }
 
-        
         const tmplName = document.getElementById('tmpl-name').value.trim();
         const murfKey = document.getElementById('murf-key').value.trim();
         const repeat = document.getElementById('repeat-flag').checked;
@@ -406,7 +397,6 @@
         yaml += `murfApiKey: "${esc(murfKey)}"\n\n`;
         yaml += `repeat: ${repeat}\n\n`;
 
-       
         yaml += 'channels:\n';
         const chFS = document.querySelectorAll('#channels-container fieldset[id^="chan-"]');
         if (chFS.length === 0) {
@@ -423,7 +413,6 @@
           yaml += '\n';
         }
 
-        
         const netAddr = document.getElementById('net-address').value.trim();
         const netPort = document.getElementById('net-port').value.trim();
         const netKey  = document.getElementById('net-authKey').value.trim();
@@ -432,9 +421,8 @@
         yaml += '  address: "' + esc(netAddr) + '"\n';
         yaml += '  port: ' + (netPort|| 'null') + '\n';
         yaml += '  authKey: "' + esc(netKey) + '"\n';
-        yaml += '  srcId: ' + (netSrc || 'null') + '\n';
+        yaml += '  srcId: ' + (netSrc || 'null') + '\n\n';
 
-       
         const sName = document.getElementById('site-name').value.trim();
         const sCtrl = document.getElementById('site-ctrl').value.trim();
         const sSite = document.getElementById('site-siteID').value.trim();
@@ -445,7 +433,6 @@
         yaml += '    siteID: "' + esc(sSite) + '"\n';
         yaml += '    systemID: "' + esc(sSys) + '"\n\n';
 
-        
         const dvmEn = document.getElementById('dvm-enabled').checked;
         const dvmAddr = document.getElementById('dvm-address').value.trim();
         const dvmPort = document.getElementById('dvm-port').value.trim();
@@ -454,14 +441,12 @@
         yaml += '  address: ' + (dvmAddr? `"${esc(dvmAddr)}"` : 'null') + '\n';
         yaml += '  port: ' + (dvmPort || 'null') + '\n\n';
 
-        
         const ttsPitch = document.getElementById('tts-pitch').value.trim();
         const ttsRate  = document.getElementById('tts-rate').value.trim();
         yaml += 'ttsConfig:\n';
         yaml += '  pitch: ' + (ttsPitch || 'null') + '\n';
         yaml += '  rate: ' + (ttsRate || 'null') + '\n\n';
 
-        
         const impEn = document.getElementById('imp-enabled').checked;
         const impComm= document.getElementById('imp-commId').value.trim();
         const impKey = document.getElementById('imp-apiKey').value.trim();
@@ -470,7 +455,6 @@
         yaml += '  commId: "' + esc(impComm) + '"\n';
         yaml += '  apiKey: "' + esc(impKey) + '"\n\n';
 
-        
         yaml += 'fields:\n';
         const fieldFS = document.querySelectorAll('#fields-container fieldset[id^="field-"]');
         if (fieldFS.length === 0) {
@@ -499,7 +483,6 @@
             if (includeName) yaml += '    includeFieldName: true\n';
             if (endOnly) yaml += '    endOnly: true\n';
 
-            
             yaml += '    options:\n';
             const opts = fsF.querySelectorAll(`input[name="field-option"]`);
             if (opts.length === 0) {
@@ -519,7 +502,6 @@
       }
     }
 
-    
     function downloadYAML() {
       const content = document.getElementById('yaml-output').value;
       if (!content) {
@@ -528,7 +510,7 @@
       }
       let fn = document.getElementById('filename').value.trim();
       if (!fn) { alert('Enter a filename.'); return; }
-      if (!fn.toLowerCase().endsWith('.yml') && !fn.toLowerCase().endsWith('.yml')) {
+      if (!fn.toLowerCase().endsWith('.yml') && !fn.toLowerCase().endsWith('.yaml')) {
         fn += '.yml';
       }
       const blob = new Blob([content], { type: 'text/yml' });
@@ -539,6 +521,107 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+  
+    function importYAML() {
+      const input = document.getElementById('yaml-input');
+      if (!input.files || !input.files[0]) {
+        alert('Please select a .yml or .yaml file to import.');
+        return;
+      }
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result;
+          const data = jsyaml.load(text);
+          if (typeof data !== 'object' || data === null) {
+            alert('Imported file does not contain a valid YAML mapping.');
+            return;
+          }
+
+        
+          document.getElementById('tmpl-name').value = data.templateName || '';
+          document.getElementById('murf-key').value = data.murfApiKey || '';
+          document.getElementById('repeat-flag').checked = !!data.repeat;
+
+        
+          const chContainer = document.getElementById('channels-container');
+          chContainer.innerHTML = '';
+          channelCount = 0;
+          if (Array.isArray(data.channels)) {
+            data.channels.forEach(ch => {
+              addChannel({ name: ch.name || '', dstId: ch.dstId || '' });
+            });
+          }
+
+          
+          if (data.network) {
+            document.getElementById('net-address').value = data.network.address || '';
+            document.getElementById('net-port').value = data.network.port != null ? data.network.port : '';
+            document.getElementById('net-authKey').value = data.network.authKey || '';
+            document.getElementById('net-srcId').value = data.network.srcId != null ? data.network.srcId : '';
+            if (data.network.site) {
+              document.getElementById('site-name').value = data.network.site.name || '';
+              document.getElementById('site-ctrl').value = data.network.site.controlChannel || '';
+              document.getElementById('site-siteID').value = data.network.site.siteID || '';
+              document.getElementById('site-systemID').value = data.network.site.systemID || '';
+            }
+          }
+
+        
+          if (data.dvm) {
+            document.getElementById('dvm-enabled').checked = !!data.dvm.enabled;
+            document.getElementById('dvm-address').value = data.dvm.address || '';
+            document.getElementById('dvm-port').value = data.dvm.port != null ? data.dvm.port : '';
+          }
+
+       
+          if (data.ttsConfig) {
+            document.getElementById('tts-pitch').value = data.ttsConfig.pitch != null ? data.ttsConfig.pitch : '';
+            document.getElementById('tts-rate').value = data.ttsConfig.rate != null ? data.ttsConfig.rate : '';
+          }
+
+       
+          if (data.imperial) {
+            document.getElementById('imp-enabled').checked = !!data.imperial.enabled;
+            document.getElementById('imp-commId').value = data.imperial.commId || '';
+            document.getElementById('imp-apiKey').value = data.imperial.apiKey || '';
+          }
+
+         
+          const fldContainer = document.getElementById('fields-container');
+          fldContainer.innerHTML = '';
+          fieldCount = 0;
+          for (let k in optionCounters) delete optionCounters[k];
+          if (Array.isArray(data.fields)) {
+            data.fields.forEach(f => {
+              addField({
+                name: f.name || '',
+                type: f.type || '',
+                multiple: !!f.multiple,
+                endOnly: !!f.endOnly,
+                separator: f.separator || '',
+                ender: f.ender || '',
+                saidName: f.saidName || '',
+                includeFieldName: !!f.includeFieldName,
+                options: Array.isArray(f.options) ? f.options : []
+              });
+            });
+          }
+
+          alert('Import successful! The form has been populated from your YML.');
+        }
+        catch (err) {
+          console.error(err);
+          alert('Failed to parse/import YAML: ' + err.message);
+        }
+      };
+      reader.onerror = function() {
+        alert('Error reading the file.');
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
